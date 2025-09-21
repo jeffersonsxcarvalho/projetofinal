@@ -1,6 +1,7 @@
 package repository;
 
 import model.Carrinho;
+import model.Produto;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,13 +10,49 @@ import java.util.List;
 public class CarrinhoRepository {
     private final String arquivo = "src/repository/carrinhos.csv";
 
-    public void salvarCarrinho(String linhaCsv) throws IOException {
-        try (FileWriter fw = new FileWriter(arquivo, true);
-             BufferedWriter bw = new BufferedWriter(fw)) {
-            bw.write(linhaCsv);
-            bw.newLine();
-        } catch (IOException e) {
-            System.out.println("Erro ao salvar carrinho: " + e.getMessage());
+    public void salvar(Carrinho carrinho) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivo, true))) {
+            writer.write(carrinho.toString());
+            writer.newLine();
+        }
+    }
+
+    // Buscar Produto por
+    public Carrinho buscarPorCpf(String cpf) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                Carrinho carrinho = Carrinho.fromCSV(linha);
+                if (carrinho.getCpfCliente().equals(cpf)) {
+                    return carrinho;
+                }
+            }
+        }
+        return null;
+    }
+
+    // Atualizar Produto existente
+    public void atualizar(Carrinho atualizado) throws IOException {
+        File inputFile = new File(arquivo);
+        File tempFile = new File("src/repository/tempCar.csv");
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                Carrinho carrinho = Carrinho.fromCSV(linha);
+                if (carrinho.getCpfCliente().equals(atualizado.getCpfCliente())) {
+                    writer.write(atualizado.toString());
+                } else {
+                    writer.write(linha);
+                }
+                writer.newLine();
+            }
+        }
+
+        if (inputFile.delete()) {
+            tempFile.renameTo(inputFile);
         }
     }
 

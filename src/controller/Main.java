@@ -8,7 +8,11 @@ public class Main {
     public static void main(String[] args) {
         Cadastro cadastro = new Cadastro();
         Scanner scanner = new Scanner(System.in);
+
+
         int opcao;
+
+
 
         do {
             System.out.println("\n--- MENU ---");
@@ -79,7 +83,18 @@ public class Main {
                     System.out.println("Valor total do estoque: R$" + String.format("%.2f", totalEstoque));
                 }
 
+                case 8 -> {
+                    System.out.print("CPF do Cliente: ");
+                    String cpf = scanner.nextLine();
+
+                    cadastro.cadastrarCarrinho(cpf, cadastro);
+                }
+
                 case 9 -> cadastro.listarCarrinhos();
+
+                case 10 -> {
+
+                }
 
                 case 0 -> System.out.println("Até mais!");
                 default -> System.out.println("Opção inválida. Tente novamente.");

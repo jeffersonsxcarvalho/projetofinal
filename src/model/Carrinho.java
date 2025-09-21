@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Carrinho {
     private final String cpfCliente;
-    private final String dataCriacao;
+    private String dataCriacao;
     private String dataAtualizacao;
     private String status;
     private double valorTotal;
@@ -33,8 +33,6 @@ public class Carrinho {
         this.valorTotal = valorTotal;
 
     }
-
-
 
     public String getCpfCliente() {
         return cpfCliente;
@@ -65,7 +63,9 @@ public class Carrinho {
         return valorTotal;
     }
 
-    private void atualizarDatas() {
+    public void setValorTotal(double valorTotal) { this.valorTotal = valorTotal; }
+
+    public void atualizarDatas() {
         LocalDateTime agora = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.dataAtualizacao = agora.format(formatter);
