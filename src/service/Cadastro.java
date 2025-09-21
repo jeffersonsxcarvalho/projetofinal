@@ -212,20 +212,22 @@ public class Cadastro {
         }
     }
 
-    public void atualizarCarrinho(String cpf, double novoValorTotal) {
+    public void atualizarCarrinho(String cpfCliente, Cadastro cadastro) {
+
+        menuItens(cpfCliente, cadastro);
 
         try{
 
             // Buscar carrinho por CPF
-            Carrinho carrinho = repoCar.buscarPorCpf(cpf);
+            Carrinho carrinho = repoCar.buscarPorCpf(cpfCliente);
             if (carrinho != null) {
                 System.out.println("Carrinho CPF: " + carrinho.getCpfCliente() + " | Status: " + carrinho.getStatus() + " | Valor total: R$" +  String.format("%.2f", carrinho.getValorTotal()));
 
                 // Atualizar produto
-                carrinho.setValorTotal(novoValorTotal);
+                //carrinho.setValorTotal(novoValorTotal);
                 repoCar.atualizar(carrinho);
 
-                System.out.println("Produto atualizado com sucesso.");
+                System.out.println("Pedido atualizado com sucesso.");
             }
         } catch (IOException e) {
             System.out.println("Erro ao acessar arquivo: " + e.getMessage());
@@ -317,7 +319,7 @@ public class Cadastro {
 
     //Menu itens do carrinho
 
-    public static void menuItens(Cadastro cadastro) {
+    public static void menuItens(String cpfCliente, Cadastro cadastro) {
         Scanner scanner = new Scanner(System.in);
         int opcao;
 
@@ -334,8 +336,6 @@ public class Cadastro {
 
             switch (opcao) {
                 case 1 -> {
-                    System.out.print("CPF do cliente: ");
-                    String cpfCliente = scanner.nextLine();
                     System.out.print("Nome do produto: ");
                     String nomeProduto = scanner.nextLine();
                     System.out.print("Quantidade de compra: ");
@@ -349,8 +349,6 @@ public class Cadastro {
                 case 2 -> cadastro.listarItens();
 
                 case 3 -> {
-                    System.out.print("CPF do cliente: ");
-                    String cpfCliente = scanner.nextLine();
                     System.out.print("Nome do produto: ");
                     String nomeProduto = scanner.nextLine();
                     System.out.print("Nova quantidade: ");

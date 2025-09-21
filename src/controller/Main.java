@@ -93,6 +93,10 @@ public class Main {
                 case 9 -> cadastro.listarCarrinhos();
 
                 case 10 -> {
+                    System.out.print("CPF do Cliente: ");
+                    String cpf = scanner.nextLine();
+
+                    cadastro.atualizarCarrinho(cpf, cadastro);
 
                 }
 
