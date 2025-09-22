@@ -43,7 +43,8 @@ public class ItemCarrinhoRepository {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 ItemCarrinho itemCarrinho = ItemCarrinho.fromCSV(linha);
-                if (itemCarrinho.getNomeProduto().equals(atualizado.getNomeProduto())) {
+                if (itemCarrinho.getNomeProduto().equals(atualizado.getNomeProduto())
+                        && itemCarrinho.getCpfCliente().equals(atualizado.getCpfCliente())) {
                     writer.write(atualizado.toString());
                 } else {
                     writer.write(linha);
@@ -68,5 +69,49 @@ public class ItemCarrinhoRepository {
             System.out.println("Nenhum item encontrado ainda.");
         }
         return itensCarrinho;
+    }
+
+    public void removerItem(String cpfCliente, String nomeProduto) {
+        List<String> linhas = new ArrayList<>();
+        boolean removido = false;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                String[] partes = linha.split(",");
+                if (partes.length < 4) continue;
+
+                String cpf = partes[0];
+                String produto = partes[1];
+
+                // Se for o item que queremos remover, não adiciona à lista
+                if (cpf.equals(cpfCliente) && produto.equalsIgnoreCase(nomeProduto)) {
+                    removido = true;
+                    continue;
+                }
+
+                linhas.add(linha);
+            }
+        } catch (IOException e) {
+            System.out.println("Erro ao ler o arquivo: " + e.getMessage());
+            return;
+        }
+
+        // Reescreve o arquivo sem a linha removida
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo))) {
+            for (String l : linhas) {
+                bw.write(l);
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar o arquivo: " + e.getMessage());
+            return;
+        }
+
+        if (removido) {
+            System.out.println("Item removido com sucesso!");
+        } else {
+            System.out.println("Item não encontrado para o cliente informado.");
+        }
     }
 }

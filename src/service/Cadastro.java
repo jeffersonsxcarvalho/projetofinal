@@ -265,16 +265,18 @@ public class Cadastro {
         return true;
     }
 
-    public void listarItens() {
+    public void listarItens(String cpfClinte) {
 
             // Listar todos os itens dos carrinhos
             System.out.println("\nLista de itens no carrinho:");
             for (ItemCarrinho itemCarrinho : repoI.listarTodos()) {
-                System.out.println("CPF do Cliente: " + itemCarrinho.getCpfCliente()
-                        + " | Nome do Produto: " + itemCarrinho.getNomeProduto()
-                        + " | Quantidade deste item: " + itemCarrinho.getQuantidade()
-                        + " | Preço: R$"
-                        +  String.format("%.2f", itemCarrinho.getPreco()));
+                if (cpfClinte.equals(itemCarrinho.getCpfCliente())){
+                    System.out.println("CPF do Cliente: " + itemCarrinho.getCpfCliente()
+                            + " | Nome do Produto: " + itemCarrinho.getNomeProduto()
+                            + " | Quantidade deste item: " + itemCarrinho.getQuantidade()
+                            + " | Preço: R$"
+                            +  String.format("%.2f", itemCarrinho.getPreco()));
+                }
             }
 
     }
@@ -312,10 +314,9 @@ public class Cadastro {
         }
     }
 
-    /*public void removerItem(String produtoNome) {
-        itens.removeIf(item -> item.getProdutoNome().equalsIgnoreCase(produtoNome));
-        atualizarDatas();
-    }*/
+    public void removerItem(String cpfCliente, String nomeProduto) {
+        repoI.removerItem(cpfCliente, nomeProduto);
+    }
 
     //Menu itens do carrinho
 
@@ -324,10 +325,11 @@ public class Cadastro {
         int opcao;
 
         do {
-            System.out.println("=====MENU=====");
+            System.out.println("=====ATUALIZAR PEDIDO CPF " + cpfCliente + "=====");
             System.out.println("1. Cadastrar item no carrinho");
             System.out.println("2. Listar itens do carrinho");
             System.out.println("3. Atualizar item do carrinho");
+            System.out.println("4. Remover item do carrinho");
             System.out.println("0. Voltar ao menu anterior");
 
             System.out.println("Entre com uma das opções: ");
@@ -346,7 +348,7 @@ public class Cadastro {
                     cadastro.adicionarItem(cpfCliente, nomeProduto, quantidade, preco);
                 }
 
-                case 2 -> cadastro.listarItens();
+                case 2 -> cadastro.listarItens(cpfCliente);
 
                 case 3 -> {
                     System.out.print("Nome do produto: ");
@@ -357,6 +359,12 @@ public class Cadastro {
                     double novoPreco = scanner.nextDouble();
                     scanner.nextLine(); // Limpa o buffer
                     cadastro.atualizarItem(cpfCliente, nomeProduto, novaQuantidade, novoPreco);
+                }
+
+                case 4 -> {
+                    System.out.print("Nome do produto: ");
+                    String nomeProduto = scanner.nextLine();
+                    cadastro.removerItem(cpfCliente, nomeProduto);
                 }
 
             }
