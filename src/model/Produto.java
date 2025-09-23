@@ -22,8 +22,11 @@ public class Produto {
     public double getValorCompra() { return valorCompra; }
     public double getValorVenda() { return valorVenda; }
 
-    public double getValorTotalEstoque() {
+    public double getValorTotalCompraEstoque() {
         return quantidadeEstoque * valorCompra;
+    }
+    public double getValorTotalVendaEstoque() {
+        return quantidadeEstoque * valorVenda;
     }
 
     public void setQuantidadeEstoque(int quantidade) {

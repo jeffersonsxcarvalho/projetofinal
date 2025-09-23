@@ -37,6 +37,10 @@ public class ItemCarrinho {
         this.preco = preco;
     }
 
+    public double calcularTotal() {
+        return quantidade * preco;
+    }
+
     @Override
     public String toString() {
         return cpfCliente + "," + nomeProduto + "," + quantidade + "," + preco;

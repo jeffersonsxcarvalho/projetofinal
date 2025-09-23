@@ -18,7 +18,7 @@ public class ItemCarrinhoRepository {
         }
     }
 
-    // Buscar Produto por
+    // Buscar Item por
     public ItemCarrinho buscarPorCpfENome(String cpfCliente, String nomeProduto) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
             String linha;
@@ -30,6 +30,24 @@ public class ItemCarrinhoRepository {
             }
         }
         return null;
+    }
+
+    // Buscar Item por
+    public List<ItemCarrinho> buscarPorCpf(String cpfCliente) {
+        List<ItemCarrinho> itensCarrinho = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                ItemCarrinho itemCarrinho = model.ItemCarrinho.fromCSV(linha);
+                if (itemCarrinho.getCpfCliente().equals(cpfCliente)) {
+                    itensCarrinho.add(ItemCarrinho.fromCSV(linha));
+                }
+
+            }
+        } catch (IOException e) {
+            System.out.println("Nenhum item encontrado ainda.");
+        }
+        return itensCarrinho;
     }
 
     // Atualizar Produto existente

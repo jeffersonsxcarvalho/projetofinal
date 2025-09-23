@@ -23,7 +23,6 @@ public class Cadastro {
     ItemCarrinhoRepository repoI = new ItemCarrinhoRepository();
 
     public void cadastrarCliente(String nome, String cpf, String email) {
-        clientes.add(new Cliente(nome, cpf, email));
 
         try{
             repoC.salvar(new Cliente(nome, cpf, email));
@@ -48,20 +47,12 @@ public class Cadastro {
         }
     }
 
-    public void atualizarCliente(String cpf, String novoNome, String novoEmail) {
-        for (Cliente c : clientes) {
-            if (c.getCpf().equals(cpf)) {
-                c.setNome(novoNome);
-                c.setEmail(novoEmail);
-                return;
-            }
-        }
-        System.out.println("Cliente com CPF " + cpf + " não encontrado.");
+    public void atualizarCliente(String cpfCliente, String novoNome, String novoEmail) {
 
         try{
 
             // Buscar por CPF
-            Cliente cliente = repoC.buscarPorCpf(cpf);
+            Cliente cliente = repoC.buscarPorCpf(cpfCliente);
             if (cliente != null) {
                 System.out.println("Cliente: " + cliente.getNome() + " | Email: " + cliente.getEmail());
 
@@ -71,6 +62,8 @@ public class Cadastro {
                 repoC.atualizar(cliente);
 
                 System.out.println("Cliente atualizado com sucesso.");
+            }else{
+                System.out.println("Cliente com CPF " + cpfCliente + " não encontrado.");
             }
         } catch (IOException e) {
             System.out.println("Erro ao acessar arquivo: " + e.getMessage());
@@ -96,7 +89,7 @@ public class Cadastro {
             // Listar todos
             System.out.println("\nLista de Produtos:");
             for (Produto produto : repoP.listarTodos()) {
-                System.out.println("Produto: " + produto.getNome() + " | Quantidade em Estoque: " + produto.getQuantidadeEstoque() + " | Valor Unitário Compra: R$" +  String.format("%.2f", produto.getValorCompra()) + " | Valor Total Estoque: R$" + String.format("%.2f", produto.getValorTotalEstoque()));
+                System.out.println("Produto: " + produto.getNome() + " | Quantidade em Estoque: " + produto.getQuantidadeEstoque() + " | Valor Unitário Compra: R$" +  String.format("%.2f", produto.getValorCompra()) + " | Valor Total Estoque: R$" + String.format("%.2f", produto.getValorTotalCompraEstoque()));
             }
         }
         catch (IOException e) {
@@ -105,21 +98,13 @@ public class Cadastro {
     }
 
     public void atualizarProduto(String nome, int novaQuantidade, double novoValorCompra) {
-        for (Produto p : produtos) {
-            if (p.getNome().equalsIgnoreCase(nome)) {
-                p.setQuantidadeEstoque(novaQuantidade);
-                p.setValorCompra(novoValorCompra);
-                return;
-            }
-        }
-        System.out.println("Produto " + nome + " não encontrado.");
 
         try{
 
             // Buscar por CPF
             Produto produto = repoP.buscarPorNome(nome);
             if (produto != null) {
-                System.out.println("Produto: " + produto.getNome() + " | Quantidade em Estoque: " + produto.getQuantidadeEstoque() + " | Valor Unitário Compra: R$" +  String.format("%.2f", produto.getValorCompra()) + " | Valor Total Estoque: R$" + String.format("%.2f", produto.getValorTotalEstoque()));
+                System.out.println("Produto: " + produto.getNome() + " | Quantidade em Estoque: " + produto.getQuantidadeEstoque() + " | Valor Unitário Compra: R$" +  String.format("%.2f", produto.getValorCompra()) + " | Valor Total Estoque: R$" + String.format("%.2f", produto.getValorTotalCompraEstoque()));
 
                 // Atualizar produto
                 produto.setQuantidadeEstoque(novaQuantidade);
@@ -133,10 +118,26 @@ public class Cadastro {
         }
     }
 
-    public double calcularValorTotalEstoque() {
-        return produtos.stream()
-                .mapToDouble(Produto::getValorTotalEstoque)
-                .sum();
+    public double calcularValorTotalEstoque(int a) {
+
+        try{
+            List<Produto> produtos = repoP.listarTodos();
+
+            if(a==1){
+                return produtos.stream()
+                        .mapToDouble(Produto::getValorTotalCompraEstoque)
+                        .sum();
+            }else if(a==2){
+                return produtos.stream()
+                        .mapToDouble(Produto::getValorTotalVendaEstoque)
+                        .sum();
+            }
+
+        } catch (IOException e) {
+            System.out.println("Erro ao acessar arquivo: " + e.getMessage());
+        }
+
+        return 0.0;
     }
 
 
@@ -144,10 +145,10 @@ public class Cadastro {
     //Relacionado a carrinhos
 
     public void cadastrarCarrinho(String cpfCliente, Cadastro cadastro) {
-        carrinhos.add(new Carrinho(cpfCliente));
 
         //Cadastro de Produtos
         try{
+            Cliente cliente = repoC.buscarPorCpf(cpfCliente);
             //if adicionado
             if (repoCar.buscarPorCpf(cpfCliente) != null){
                 System.out.println("Pedido já existe, digite 10 para atualizar o pedido.");
@@ -158,7 +159,7 @@ public class Cadastro {
                 int itensAdicionados = 0;
 
                 do {
-                    System.out.println("=====MENU=====");
+                    System.out.println("=====MENU CARRINHO DE " + cliente.getNome().toUpperCase() + "=====");
                     System.out.println("1. Cadastrar item no carrinho");
                     System.out.println("0. Finalizar");
 
@@ -204,7 +205,7 @@ public class Cadastro {
             // Listar todos
             System.out.println("\nLista de Carrinhos:");
             for (Carrinho carrinho : repoCar.listarTodos()) {
-                System.out.println("CPF do Cliente: " + carrinho.getCpfCliente() + " | Valor total: " + carrinho.getValorTotal() +  " | Status: " + carrinho.getStatus() + " | Cadastrado em: " + carrinho.getDataCriacao());
+                System.out.println("CPF do Cliente: " + carrinho.getCpfCliente() + " | Valor total: " + carrinho.getValorTotal() +  " | Status: " + carrinho.getStatus() + " | Cadastrado em: " + carrinho.getDataCriacao() + " | Modificado em: " + carrinho.getDataAtualizacao());
             }
         }
         catch (IOException e) {
@@ -224,7 +225,8 @@ public class Cadastro {
                 System.out.println("Carrinho CPF: " + carrinho.getCpfCliente() + " | Status: " + carrinho.getStatus() + " | Valor total: R$" +  String.format("%.2f", carrinho.getValorTotal()));
 
                 // Atualizar produto
-                //carrinho.setValorTotal(novoValorTotal);
+                carrinho.setValorTotal(valorTotalCarrinho(cpfCliente));
+                carrinho.atualizarDatas();
                 repoCar.atualizar(carrinho);
 
                 System.out.println("Pedido atualizado com sucesso.");
@@ -232,6 +234,19 @@ public class Cadastro {
         } catch (IOException e) {
             System.out.println("Erro ao acessar arquivo: " + e.getMessage());
         }
+    }
+
+    public double valorTotalCarrinho(String cpfCliente) {
+
+        double valorTotalCarrinho = 0.0;
+
+        List<ItemCarrinho> itensCarrinho= repoI.buscarPorCpf(cpfCliente);
+
+        for (ItemCarrinho itemCarrinho : itensCarrinho) {
+            valorTotalCarrinho += itemCarrinho.calcularTotal();
+        }
+
+        return valorTotalCarrinho;
     }
 
     // Relacionado a itens do carrinho
@@ -243,21 +258,35 @@ public class Cadastro {
             Produto produto = produtoRepo.buscarPorNome(nomeProduto);
             // Buscar carrinho por CPF
             Carrinho carrinho = repoCar.buscarPorCpf(cpfCliente);
+
+            ItemCarrinho itemCarrinho = repoI.buscarPorCpfENome(cpfCliente, nomeProduto);
+
             if (produto == null) {
                 System.out.println("Produto não encontrado.");
                 return false;
             }
+
             if (quantidade > produto.getQuantidadeEstoque()) {
                 System.out.println("Estoque insuficiente! Disponível: " + produto.getQuantidadeEstoque());
                 return false;
             }
-            repoI.salvar(new ItemCarrinho(cpfCliente, nomeProduto, quantidade, preco));
-            System.out.println("Produto cadastrado com sucesso.");
+
+            if(itemCarrinho != null) {
+                itemCarrinho.setQuantidade(itemCarrinho.getQuantidade() + quantidade);
+                repoI.atualizar(itemCarrinho);
+                System.out.println("Item atualizado com sucesso.");
+            }else{
+                repoI.salvar(new ItemCarrinho(cpfCliente, nomeProduto, quantidade, preco));
+                System.out.println("Item cadastrado com sucesso.");
+            }
+
+            carrinho.setValorTotal(valorTotalCarrinho(cpfCliente));
+            atualizarProduto(nomeProduto, produto.getQuantidadeEstoque()-quantidade,produto.getValorCompra());
+
+
             if(carrinho != null) {
                 carrinho.atualizarDatas();
             }
-
-
 
         } catch (IOException e) {
             System.out.println("Erro ao acessar arquivo: " + e.getMessage());
@@ -286,24 +315,37 @@ public class Cadastro {
         try{
             // Buscar Produto para comparar estoque.
             Produto produto = produtoRepo.buscarPorNome(nomeProduto);
+
+            //Carrinho
+            Carrinho carrinho = repoCar.buscarPorCpf(cpfCliente);
+
             // Buscar por CPF
             ItemCarrinho itemCarrinho = repoI.buscarPorCpfENome(cpfCliente, nomeProduto);
             if (itemCarrinho != null) {
                 System.out.println("CPF do Cliente: " + itemCarrinho.getCpfCliente() + " | Nome do Produto: " + itemCarrinho.getNomeProduto() + " | Quantidade deste item: " + itemCarrinho.getQuantidade() + " | Preço: R$" +  String.format("%.2f", itemCarrinho.getPreco()));
 
+                int difQuantidade = novaQuantidade - itemCarrinho.getQuantidade();
+
                 // Atualizar produto
-                itemCarrinho.setQuantidade(novaQuantidade);
-                if (novaQuantidade > produto.getQuantidadeEstoque()) {
-                    System.out.println("Estoque insuficiente! Disponível: " + produto.getQuantidadeEstoque());
+
+                if(novaQuantidade > 0) {
+                    if(difQuantidade <= 0) {
+                        itemCarrinho.setQuantidade(novaQuantidade);
+                        itemCarrinho.setPreco(novoPreco);
+                        atualizarProduto(nomeProduto,produto.getQuantidadeEstoque()-difQuantidade, produto.getValorCompra());
+                        carrinho.setValorTotal(valorTotalCarrinho(cpfCliente));
+                    }else if (novaQuantidade > produto.getQuantidadeEstoque()) {
+                        System.out.println("Estoque insuficiente! Disponível: " + produto.getQuantidadeEstoque());
+                        return;
+                    }
+                }else if(novaQuantidade <= 0) {
+                    System.out.println("A nova quantidade deve ser um numero positivo.");
                     return;
-                }else{
-                    itemCarrinho.setPreco(novoPreco);
-                    produto.setQuantidadeEstoque(produto.getQuantidadeEstoque()-novaQuantidade);
                 }
 
                 repoI.atualizar(itemCarrinho);
 
-                System.out.println("Produto atualizado com sucesso.");
+                System.out.println("Item atualizado com sucesso.");
             } else {
                 System.out.println("Item não encontrado no carrinho");
                 return;
@@ -315,60 +357,97 @@ public class Cadastro {
     }
 
     public void removerItem(String cpfCliente, String nomeProduto) {
-        repoI.removerItem(cpfCliente, nomeProduto);
+        try{
+            int qtdeItensCarrinho = repoI.buscarPorCpf(cpfCliente).size();
+            int quantidadeItem = repoI.buscarPorCpfENome(cpfCliente, nomeProduto).getQuantidade();
+
+            Carrinho carrinho = repoCar.buscarPorCpf(cpfCliente);
+
+            Produto produto = repoP.buscarPorNome(nomeProduto);
+
+            if (qtdeItensCarrinho > 1){
+                repoI.removerItem(cpfCliente, nomeProduto);
+                atualizarProduto(nomeProduto, produto.getQuantidadeEstoque()+quantidadeItem, produto.getValorCompra());
+                carrinho.setValorTotal(valorTotalCarrinho(cpfCliente));
+            } else {
+                System.out.println("O carrinho precisa ter pelo menos 1 item cadastrado.");
+            }
+
+        } catch (IOException e) {
+            System.out.println("Erro ao acessar arquivo: " + e.getMessage());
+        }
+    }
+
+    public double valorTotalItem(String cpfCliente, String nomeProduto) {
+
+        try{
+            double valorTotal = repoI.buscarPorCpfENome(cpfCliente, nomeProduto).calcularTotal();
+            return valorTotal;
+        } catch (IOException e) {
+            System.out.println("Erro ao acessar arquivo " + e.getMessage());
+        }
+        return 0.0;
     }
 
     //Menu itens do carrinho
 
-    public static void menuItens(String cpfCliente, Cadastro cadastro) {
-        Scanner scanner = new Scanner(System.in);
-        int opcao;
+    public void menuItens(String cpfCliente, Cadastro cadastro) {
 
-        do {
-            System.out.println("=====ATUALIZAR PEDIDO CPF " + cpfCliente + "=====");
-            System.out.println("1. Cadastrar item no carrinho");
-            System.out.println("2. Listar itens do carrinho");
-            System.out.println("3. Atualizar item do carrinho");
-            System.out.println("4. Remover item do carrinho");
-            System.out.println("0. Voltar ao menu anterior");
+        try{
+            Cliente cliente = repoC.buscarPorCpf(cpfCliente);
 
-            System.out.println("Entre com uma das opções: ");
-            opcao = scanner.nextInt();
-            scanner.nextLine();
+            Scanner scanner = new Scanner(System.in);
+            int opcao;
 
-            switch (opcao) {
-                case 1 -> {
-                    System.out.print("Nome do produto: ");
-                    String nomeProduto = scanner.nextLine();
-                    System.out.print("Quantidade de compra: ");
-                    int quantidade = scanner.nextInt();
-                    System.out.print("Valor de compra: ");
-                    double preco = scanner.nextDouble();
-                    scanner.nextLine(); // Limpa o buffer
-                    cadastro.adicionarItem(cpfCliente, nomeProduto, quantidade, preco);
+            do {
+                System.out.println("=====ATUALIZAR PEDIDO DE " + cliente.getNome().toUpperCase() + "=====");
+                System.out.println("1. Cadastrar item no carrinho");
+                System.out.println("2. Listar itens do carrinho");
+                System.out.println("3. Atualizar item do carrinho");
+                System.out.println("4. Remover item do carrinho");
+                System.out.println("0. Voltar ao menu anterior");
+
+                System.out.println("Entre com uma das opções: ");
+                opcao = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (opcao) {
+                    case 1 -> {
+                        System.out.print("Nome do produto: ");
+                        String nomeProduto = scanner.nextLine();
+                        System.out.print("Quantidade de compra: ");
+                        int quantidade = scanner.nextInt();
+                        System.out.print("Valor de compra: ");
+                        double preco = scanner.nextDouble();
+                        scanner.nextLine(); // Limpa o buffer
+                        cadastro.adicionarItem(cpfCliente, nomeProduto, quantidade, preco);
+                    }
+
+                    case 2 -> cadastro.listarItens(cpfCliente);
+
+                    case 3 -> {
+                        System.out.print("Nome do produto: ");
+                        String nomeProduto = scanner.nextLine();
+                        System.out.print("Nova quantidade: ");
+                        int novaQuantidade = scanner.nextInt();
+                        System.out.print("Novo Preço: ");
+                        double novoPreco = scanner.nextDouble();
+                        scanner.nextLine(); // Limpa o buffer
+                        cadastro.atualizarItem(cpfCliente, nomeProduto, novaQuantidade, novoPreco);
+                    }
+
+                    case 4 -> {
+                        System.out.print("Nome do produto: ");
+                        String nomeProduto = scanner.nextLine();
+                        cadastro.removerItem(cpfCliente, nomeProduto);
+                    }
+
                 }
+            } while (opcao != 0);
 
-                case 2 -> cadastro.listarItens(cpfCliente);
-
-                case 3 -> {
-                    System.out.print("Nome do produto: ");
-                    String nomeProduto = scanner.nextLine();
-                    System.out.print("Nova quantidade: ");
-                    int novaQuantidade = scanner.nextInt();
-                    System.out.print("Novo Preço: ");
-                    double novoPreco = scanner.nextDouble();
-                    scanner.nextLine(); // Limpa o buffer
-                    cadastro.atualizarItem(cpfCliente, nomeProduto, novaQuantidade, novoPreco);
-                }
-
-                case 4 -> {
-                    System.out.print("Nome do produto: ");
-                    String nomeProduto = scanner.nextLine();
-                    cadastro.removerItem(cpfCliente, nomeProduto);
-                }
-
-            }
-        } while (opcao != 0);
+        }catch (IOException e) {
+            System.out.println("Não foi possível acessar arquivo" + e.getMessage());
+        }
     }
 
     public static List<Cliente> getClientes() { return clientes; }

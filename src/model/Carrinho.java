@@ -42,6 +42,10 @@ public class Carrinho {
         return dataCriacao;
     }
 
+    public String getDataAtualizacao() {
+        return dataAtualizacao;
+    }
+
     /*public int getQuantidadeDiferentes() {
         return itens.size();
     }

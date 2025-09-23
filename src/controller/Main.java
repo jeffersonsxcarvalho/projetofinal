@@ -79,8 +79,11 @@ public class Main {
                 }
 
                 case 7 -> {
-                    double totalEstoque = cadastro.calcularValorTotalEstoque();
-                    System.out.println("Valor total do estoque: R$" + String.format("%.2f", totalEstoque));
+                    double totalEstoqueCompra = cadastro.calcularValorTotalEstoque(1);
+                    double totalEstoqueVenda = cadastro.calcularValorTotalEstoque(2);
+
+                    System.out.println("Valor total de compra do estoque: R$" + String.format("%.2f", totalEstoqueCompra));
+                    System.out.println("Valor total de venda do estoque: R$" + String.format("%.2f", totalEstoqueVenda));
                 }
 
                 case 8 -> {
