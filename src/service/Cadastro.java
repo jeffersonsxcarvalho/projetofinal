@@ -199,7 +199,6 @@ public class Cadastro {
     }
 
     public void listarCarrinhos() {
-        carrinhos.forEach(System.out::println);
 
         try{
             // Listar todos
@@ -257,6 +256,7 @@ public class Cadastro {
 
             Produto produto = produtoRepo.buscarPorNome(nomeProduto);
             // Buscar carrinho por CPF
+
             Carrinho carrinho = repoCar.buscarPorCpf(cpfCliente);
 
             ItemCarrinho itemCarrinho = repoI.buscarPorCpfENome(cpfCliente, nomeProduto);
@@ -280,7 +280,8 @@ public class Cadastro {
                 System.out.println("Item cadastrado com sucesso.");
             }
 
-            carrinho.setValorTotal(valorTotalCarrinho(cpfCliente));
+
+
             atualizarProduto(nomeProduto, produto.getQuantidadeEstoque()-quantidade,produto.getValorCompra());
 
 
@@ -322,7 +323,6 @@ public class Cadastro {
             // Buscar por CPF
             ItemCarrinho itemCarrinho = repoI.buscarPorCpfENome(cpfCliente, nomeProduto);
             if (itemCarrinho != null) {
-                System.out.println("CPF do Cliente: " + itemCarrinho.getCpfCliente() + " | Nome do Produto: " + itemCarrinho.getNomeProduto() + " | Quantidade deste item: " + itemCarrinho.getQuantidade() + " | Preço: R$" +  String.format("%.2f", itemCarrinho.getPreco()));
 
                 int difQuantidade = novaQuantidade - itemCarrinho.getQuantidade();
 
@@ -332,6 +332,8 @@ public class Cadastro {
                     if(difQuantidade <= 0) {
                         itemCarrinho.setQuantidade(novaQuantidade);
                         itemCarrinho.setPreco(novoPreco);
+                        System.out.println("CPF do Cliente: " + itemCarrinho.getCpfCliente() + " | Nome do Produto: " + itemCarrinho.getNomeProduto() + " | Nova quantidade deste item: " + itemCarrinho.getQuantidade() + " | Preço: R$" +  String.format("%.2f", itemCarrinho.getPreco()));
+
                         atualizarProduto(nomeProduto,produto.getQuantidadeEstoque()-difQuantidade, produto.getValorCompra());
                         carrinho.setValorTotal(valorTotalCarrinho(cpfCliente));
                     }else if (novaQuantidade > produto.getQuantidadeEstoque()) {

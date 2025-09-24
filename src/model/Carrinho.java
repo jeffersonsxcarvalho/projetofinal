@@ -83,6 +83,5 @@ public class Carrinho {
     public static Carrinho fromCSV(String linha) {
         String[] campos = linha.split(",");
         return new Carrinho(campos[0].trim(), campos[1].trim(), campos[2].trim(), campos[3].trim(), Double.parseDouble(campos[4].trim()));
-
     }
 }
